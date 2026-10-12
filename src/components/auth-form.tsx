@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
@@ -10,8 +9,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { siteConfig } from "@/config/site";
 
-export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
-  const signingUp = mode === "sign-up";
+// FR-002: hanya mode masuk yang tersedia. Pendaftaran publik dinonaktifkan;
+// akun dibuat admin lewat jalur privat.
+export function AuthForm() {
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -23,31 +23,20 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
     setPending(true);
     setError("");
     try {
-      const credentials = {
+      const result = await authClient.signIn.email({
         email: String(data.get("email")).trim(),
         password: String(data.get("password")),
-      };
-      const result = signingUp
-        ? await authClient.signUp.email({
-            ...credentials,
-            name: String(data.get("name")).trim(),
-          })
-        : await authClient.signIn.email(credentials);
+      });
       if (result.error) {
         setError(
-          signingUp
-            ? result.error.message ||
-                "We couldn't create your account. Please try again."
-            : "We couldn't sign you in. Check your email and password and try again.",
+          "Tidak bisa masuk. Periksa email dan password, lalu coba lagi.",
         );
         return;
       }
       router.replace(siteConfig.homePath);
       router.refresh();
     } catch {
-      setError(
-        "We couldn't reach the server. Check your connection and try again.",
-      );
+      setError("Tidak bisa menghubungi server. Periksa koneksi lalu coba lagi.");
     } finally {
       setPending(false);
     }
@@ -55,16 +44,10 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
 
   return (
     <div className="w-full max-w-sm">
-      <p className="mb-3 text-sm font-medium text-primary">
-        {signingUp ? "A place to begin" : "Good to see you"}
-      </p>
-      <h1 className="text-3xl font-semibold tracking-tight">
-        {signingUp ? "Create your account" : "Welcome back"}
-      </h1>
+      <p className="mb-3 text-sm font-medium text-primary">Selamat datang kembali</p>
+      <h1 className="text-3xl font-semibold tracking-tight">Masuk</h1>
       <p className="mt-3 text-base leading-7 text-muted-foreground">
-        {signingUp
-          ? "One small step. Then make this app your own."
-          : "Sign in to pick up where you left off."}
+        Masuk untuk mengelola proyek tower Anda.
       </p>
       <form
         onSubmit={onSubmit}
@@ -73,24 +56,7 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
         aria-describedby={error ? "auth-error" : undefined}
       >
         <fieldset disabled={pending} className="space-y-5">
-          <legend className="sr-only">
-            {signingUp ? "Account details" : "Sign in details"}
-          </legend>
-          {signingUp && (
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                name="name"
-                autoComplete="name"
-                placeholder="Your name"
-                required
-                minLength={1}
-                maxLength={100}
-                pattern=".*\S.*"
-              />
-            </div>
-          )}
+          <legend className="sr-only">Detail masuk</legend>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -98,7 +64,7 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
               name="email"
               type="email"
               autoComplete="email"
-              placeholder="you@example.com"
+              placeholder="anda@example.com"
               required
               maxLength={254}
             />
@@ -109,17 +75,11 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
               id="password"
               name="password"
               type="password"
-              autoComplete={signingUp ? "new-password" : "current-password"}
+              autoComplete="current-password"
               required
               minLength={8}
               maxLength={128}
-              aria-describedby={signingUp ? "password-hint" : undefined}
             />
-            {signingUp && (
-              <p id="password-hint" className="text-sm text-muted-foreground">
-                Use at least 8 characters.
-              </p>
-            )}
           </div>
           {error && (
             <p
@@ -137,24 +97,11 @@ export function AuthForm({ mode }: { mode: "sign-in" | "sign-up" }) {
                 aria-hidden="true"
               />
             ) : null}
-            {pending
-              ? "Please wait…"
-              : signingUp
-                ? "Create account"
-                : "Sign in"}
+            {pending ? "Mohon tunggu…" : "Masuk"}
             {!pending && <ArrowRight aria-hidden="true" />}
           </Button>
         </fieldset>
       </form>
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        {signingUp ? "Already have an account?" : "New here?"}{" "}
-        <Link
-          className="rounded-sm font-medium text-foreground underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
-          href={signingUp ? "/sign-in" : "/sign-up"}
-        >
-          {signingUp ? "Sign in" : "Create an account"}
-        </Link>
-      </p>
     </div>
   );
 }
