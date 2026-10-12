@@ -43,6 +43,13 @@
       "when": 1791833428623,
       "tag": "0005_hot_sir_ram",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791833579103,
+      "tag": "0006_outstanding_deathbird",
+      "breakpoints": true
     }
   ]
 }

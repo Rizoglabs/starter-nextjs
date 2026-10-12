@@ -8,8 +8,9 @@ export const runtime = "nodejs";
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/sites", label: "Sites" },
+  { href: "/bast", label: "BAST" },
   { href: "/pengaturan", label: "Pengaturan" },
-  // Modul lain (BAST, PKBON, Reporting) menyusul di M4–M6.
+  // Modul lain (PKBON, Reporting) menyusul di M5–M6.
 ];
 
 export default async function ProtectedLayout({

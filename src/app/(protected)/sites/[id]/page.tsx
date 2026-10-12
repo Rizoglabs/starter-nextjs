@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { SiteDetail } from "@/components/site-detail";
 import { SiteProgressTab } from "@/components/site-progress-tab";
 import { SiteAttachmentsTab } from "@/components/site-attachments-tab";
+import { SiteBastTab } from "@/components/site-bast-tab";
 import { cn } from "@/lib/utils";
 
 export const runtime = "nodejs";
@@ -17,8 +18,9 @@ const TABS = [
   { id: "progress", label: "Progress" },
   { id: "dokumen", label: "Dokumen" },
   { id: "foto", label: "Foto" },
+  { id: "bast", label: "BAST" },
   // Menyusul di milestone berikutnya:
-  // Pembayaran (M6), Notes (pasca-MVP), BAST (M4).
+  // Pembayaran (M6), Notes (pasca-MVP).
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -97,6 +99,7 @@ export default async function SiteDetailPage({
       {activeTab === "foto" && (
         <SiteAttachmentsTab siteId={site.id} kategori="foto" />
       )}
+      {activeTab === "bast" && <SiteBastTab siteId={site.id} />}
     </div>
   );
 }
