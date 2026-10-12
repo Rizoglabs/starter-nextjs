@@ -6,8 +6,10 @@ import { requireSession } from "@/lib/session";
 export const runtime = "nodejs";
 
 const navItems = [
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/sites", label: "Sites" },
-  // Modul lain (Dashboard, BAST, PKBON, Reporting, Pengaturan) menyusul di M3–M6.
+  { href: "/pengaturan", label: "Pengaturan" },
+  // Modul lain (BAST, PKBON, Reporting) menyusul di M4–M6.
 ];
 
 export default async function ProtectedLayout({

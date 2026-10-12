@@ -7,3 +7,5 @@ export * from "./notes";
 export * from "./sites";
 export * from "./site_attachments";
 export * from "./site_progress_log";
+export * from "./clients";
+export * from "./sla_rules";
