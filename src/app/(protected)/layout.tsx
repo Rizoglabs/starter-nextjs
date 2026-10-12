@@ -9,8 +9,9 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/sites", label: "Sites" },
   { href: "/bast", label: "BAST" },
+  { href: "/pkbon", label: "PKBON" },
   { href: "/pengaturan", label: "Pengaturan" },
-  // Modul lain (PKBON, Reporting) menyusul di M5–M6.
+  // Modul lain (Reporting) menyusul di M6.
 ];
 
 export default async function ProtectedLayout({

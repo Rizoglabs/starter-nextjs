@@ -50,6 +50,13 @@
       "when": 1791833579103,
       "tag": "0006_outstanding_deathbird",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791833805465,
+      "tag": "0007_clever_chronomancer",
+      "breakpoints": true
     }
   ]
 }
