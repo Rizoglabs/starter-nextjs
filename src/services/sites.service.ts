@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, ilike, or, type SQL } from "drizzle-orm";
 import { db } from "@/db";
 import { sites } from "@/db/schema";
 import type {
@@ -43,12 +43,26 @@ const fields = {
 
 export async function listSites(
   userId: string,
-  { limit, offset }: ListSitesInput,
+  { limit, offset, q, sow, regional, status }: ListSitesInput,
 ) {
+  const conditions: SQL[] = [eq(sites.userId, userId)];
+  if (q) {
+    const pattern = `%${q.replace(/[%_]/g, "")}%`;
+    conditions.push(
+      or(
+        ilike(sites.namaSite, pattern),
+        ilike(sites.projectId, pattern),
+        ilike(sites.siteId, pattern),
+      )!,
+    );
+  }
+  if (sow) conditions.push(eq(sites.sow, sow));
+  if (regional) conditions.push(eq(sites.regional, regional));
+  if (status) conditions.push(eq(sites.statusProject, status));
   const rows = await db
     .select(fields)
     .from(sites)
-    .where(eq(sites.userId, userId))
+    .where(and(...conditions))
     .orderBy(desc(sites.createdAt), desc(sites.id))
     .limit(limit + 1)
     .offset(offset);
@@ -94,4 +108,24 @@ export async function deleteSite(userId: string, id: string) {
     .where(and(eq(sites.id, id), eq(sites.userId, userId)))
     .returning({ id: sites.id });
   return Boolean(deleted);
+}
+
+// F-003: nilai unik untuk opsi filter SOW & Regional.
+export async function getSiteFacets(userId: string) {
+  const [sowRows, regionalRows] = await Promise.all([
+    db
+      .selectDistinct({ value: sites.sow })
+      .from(sites)
+      .where(and(eq(sites.userId, userId))),
+    db
+      .selectDistinct({ value: sites.regional })
+      .from(sites)
+      .where(and(eq(sites.userId, userId))),
+  ]);
+  const clean = (rows: { value: string | null }[]) =>
+    rows
+      .map((r) => r.value?.trim())
+      .filter((v): v is string => Boolean(v))
+      .sort((a, b) => a.localeCompare(b, "id"));
+  return { sow: clean(sowRows), regional: clean(regionalRows) };
 }
